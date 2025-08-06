@@ -1,0 +1,58 @@
+from ultralytics import YOLO
+import cv2
+
+# Đường dẫn tới video
+video_path = "DASH CAM VIDEO AVE OF THE STARS - Century City CALIFORNIA.mp4"  # Thay bằng tên file video thực tế của bạn
+
+# Load model YOLOv8
+model = YOLO("yolov8n.pt")
+
+# Mở video
+cap = cv2.VideoCapture(video_path)
+
+if not cap.isOpened():
+    print("Không thể mở video.")
+    exit()
+
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    # Nhận diện đối tượng
+    results = model(frame, verbose=False)
+    boxes = results[0].boxes.xywh
+    confidences = results[0].boxes.conf
+    labels = results[0].boxes.cls
+
+    for box, conf, label in zip(boxes, confidences, labels):
+        x, y, w, h = box
+        x1, y1 = int(x - w / 2), int(y - h / 2)
+        x2, y2 = int(x + w / 2), int(y + h / 2)
+
+        class_id = int(label)
+        class_name = model.names[class_id]
+        label_text = f"{class_name} {conf:.2f}"
+
+        if class_name == "traffic light":
+            # Xử lý riêng: khung đỏ + log ra console
+            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), 2)
+            cv2.putText(frame, label_text, (x1, y1 - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+            print(f"Phát hiện traffic light tại: ({x1}, {y1}), ({x2}, {y2})")
+
+        else:
+            # Xử lý mặc định: khung xanh
+            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv2.putText(frame, label_text, (x1, y1 - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+
+    # Hiển thị khung hình
+    cv2.imshow("YOLOv8 Object Detection", frame)
+
+    # Bấm 'q' để thoát
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
