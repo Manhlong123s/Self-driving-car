@@ -1,17 +1,14 @@
 import os
-import shutil
 import cv2
-import albumentations as A
-import numpy as np
 import unicodedata
-
+import re
+import albumentations as A
 # Thiết lập thư mục đích
-destination_root = "C:\\Users\\Administrator\\PyCharmMiscProject\\data"  # Đổi thành thư mục đích của bạn
+destination_root = "C:\\Users\\FPT\\PyCharmMiscProject\\data"  # Đổi thành thư mục đích của bạn
 os.makedirs(destination_root, exist_ok=True)
 
 # Đường dẫn tới thư mục chứa ảnh
-folder_path = r"C:\Users\Administrator\Desktop\biển báo cấm"  # Đổi thành thư mục chứa ảnh của bạn
-# Kiểm tra quyền đọc
+folder_path = "C:\\Users\\FPT\\PyCharmMiscProject\\bien_bao_cam"  # Đổi thành thư mục chứa ảnh của bạn
 
 # Kiểm tra nếu không có thư mục nào được chỉ định
 if not folder_path:
@@ -51,7 +48,8 @@ augmentations = {
     'shift_scale_rotate': A.ShiftScaleRotate(shift_limit=0.1, scale_limit=0.1, rotate_limit=20, p=1),
     'elastic_transform': A.ElasticTransform(p=1),
     'grid_distortion': A.GridDistortion(p=1),
-    'Affine Transform': A.Affine(scale=(0.9, 1.1), translate_percent=(0.1, 0.1), rotate=(-20, 20), shear=(-10, 10), p=1.0),
+    'Affine Transform': A.Affine(scale=(0.9, 1.1), translate_percent=(0.1, 0.1), rotate=(-20, 20), shear=(-10, 10),
+                                 p=1.0),
     'Perspective Transform': A.Perspective(scale=(0.05, 0.1), p=1.0),
 }
 
@@ -59,17 +57,26 @@ augmentations = {
 for file_name in image_files:
     # Đọc ảnh
     file_path = os.path.join(folder_path, file_name)
-    image_cv = cv2.imread(file_path)
+
+    # Đảm bảo đường dẫn đúng Unicode
+    try:
+        image_cv = cv2.imread(file_path)
+    except Exception as e:
+        print(f"Error reading file {file_name}: {e}")
+        continue
+
     if image_cv is None:
         print(f"Unable to read the image from: {file_path}")
         continue
 
     # Làm sạch tên tệp và tạo thư mục đích
     name, ext = os.path.splitext(file_name)
-    name_no_accent = ''.join(
-        c for c in unicodedata.normalize('NFKD', name) if not unicodedata.combining(c)
-    )
-    clean_name = name_no_accent.replace(" ", "").lower()
+
+    # Loại bỏ dấu ngoặc và nội dung bên trong tên file
+    clean_name = re.sub(r'\(.*?\)', '', name).strip().replace(' ', '_')
+    clean_name = ''.join(c for c in unicodedata.normalize('NFKD', clean_name) if not unicodedata.combining(c))
+    clean_name = clean_name.lower()
+
     target_folder = os.path.join(destination_root, clean_name)
     os.makedirs(target_folder, exist_ok=True)
 
