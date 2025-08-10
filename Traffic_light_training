@@ -1,0 +1,125 @@
+import os
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+from keras import Sequential
+from keras.src.layers import Conv2D, MaxPooling2D, BatchNormalization, Dropout, Dense, Flatten
+from tensorflow.keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
+from tensorflow.keras.preprocessing import image
+from tkinter import Tk, filedialog
+
+# === Đường dẫn dữ liệu ===
+train_dir = r'C:\Users\FPT\PyCharmMiscProject\augemt'
+test_dir = r'C:\Users\FPT\PyCharmMiscProject\Data_test'  # <== Thư mục test của bạn
+
+# === ImageDataGenerator cho train và test ===
+train_gen = ImageDataGenerator(rescale=1./255)
+test_gen = ImageDataGenerator(rescale=1./255)
+
+# === Load dữ liệu ===
+train_ds = train_gen.flow_from_directory(train_dir, target_size=(224, 224), batch_size=32, class_mode='categorical')
+test_ds = test_gen.flow_from_directory(test_dir, target_size=(224, 224), batch_size=32, class_mode='categorical', shuffle=False)
+
+# === Danh sách class ===
+classes = list(train_ds.class_indices.keys())
+
+# === Xây dựng mô hình CNN ===
+model = Sequential()
+model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(224, 224, 3)))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(BatchNormalization())
+
+model.add(Conv2D(64, kernel_size=(3, 3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(BatchNormalization())
+
+model.add(Conv2D(64, kernel_size=(3, 3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(BatchNormalization())
+
+model.add(Conv2D(96, kernel_size=(3, 3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(BatchNormalization())
+
+model.add(Conv2D(32, kernel_size=(3, 3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(BatchNormalization())
+
+model.add(Dropout(0.2))
+model.add(Flatten())
+model.add(Dense(128, activation='relu'))
+model.add(Dense(len(classes), activation='softmax'))
+
+# === Biên dịch mô hình ===
+model.compile(
+    loss='categorical_crossentropy',
+    optimizer='adam',
+    metrics=["accuracy"]
+)
+
+# === Huấn luyện mô hình ===
+history = model.fit(train_ds, epochs=20, batch_size=32, validation_data=test_ds)
+
+# === Đánh giá mô hình trên tập test ===
+loss, acc = model.evaluate(test_ds)
+print(f"\n🎯 Test accuracy: {acc * 100:.2f}% | Test loss: {loss:.4f}")
+
+
+# === Hàm dự đoán ảnh mới ===
+def predict_image(image_path, threshold=0.3):
+    img = load_img(image_path, target_size=(224, 224))
+    plt.imshow(img)
+    plt.axis('off')
+    plt.title("Ảnh đầu vào")
+    plt.show()
+
+    # Tiền xử lý
+    x = img_to_array(img)
+    x = x / 255.0
+    x = np.expand_dims(x, axis=0)
+
+    # Dự đoán
+    pred = model.predict(x)[0]
+    predicted_prob = np.max(pred)
+    predicted_class_index = np.argmax(pred)
+    predicted_class = classes[predicted_class_index]
+
+    print("\n🧠 Prediction Probabilities:")
+    for i, cls in enumerate(classes):
+        print(f"- {cls}: {pred[i] * 100:.2f}%")
+
+    if predicted_prob < threshold:
+        print(f"\n⚠️ Dự đoán không chắc chắn (xác suất: {predicted_prob:.2f})")
+        print("Ảnh có thể không thuộc lớp nào.")
+        return
+
+    print(f"\n✅ Ảnh thuộc lớp: {predicted_class} (xác suất: {predicted_prob:.2f})")
+    print(f"User: {predicted_class}")
+
+
+# === Chọn ảnh test bằng GUI và dự đoán ===
+def choose_and_predict():
+    root = Tk()
+    root.withdraw()
+    file_path = filedialog.askopenfilename(
+        title="Chọn ảnh để dự đoán",
+        filetypes=[("Image Files", "*.jpg *.jpeg *.png *.bmp")]
+    )
+    if file_path:
+        print(f"\n🖼️ Đã chọn ảnh: {file_path}")
+        predict_image(file_path)
+    else:
+        print("❌ Không có ảnh nào được chọn.")
+
+# === Hoặc: Dự đoán tất cả ảnh trong một folder test ===
+def predict_folder(folder_path):
+    for file in os.listdir(folder_path):
+        if file.lower().endswith(('.jpg', '.jpeg', '.png')):
+            image_path = os.path.join(folder_path, file)
+            print(f"\n=== Dự đoán cho: {file} ===")
+            predict_image(image_path)
+
+# === Gọi một trong hai hàm dưới đây ===
+# choose_and_predict()  # ← Mở giao diện chọn ảnh
+#predict_folder(r"C:\Users\FPT\PyCharmMiscProject\test_single_images")  # ← Dự đoán ảnh trong folder test
+
