@@ -4,11 +4,11 @@ import unicodedata
 import re
 import albumentations as A
 # Thiết lập thư mục đích
-destination_root = "C:\\Users\\FPT\\PyCharmMiscProject\\data"  # Đổi thành thư mục đích của bạn
+destination_root = "C:\\Users\\FPT\\PyCharmMiscProject\\augemt"  # Đổi thành thư mục đích của bạn
 os.makedirs(destination_root, exist_ok=True)
 
 # Đường dẫn tới thư mục chứa ảnh
-folder_path = "C:\\Users\\FPT\\PyCharmMiscProject\\bien_bao_cam"  # Đổi thành thư mục chứa ảnh của bạn
+folder_path = "C:\\Users\\FPT\\PyCharmMiscProject\\data"  # Đổi thành thư mục chứa ảnh của bạn
 
 # Kiểm tra nếu không có thư mục nào được chỉ định
 if not folder_path:
