@@ -1,0 +1,213 @@
+import keyboard
+import time
+print("1. Cố định tốc độ duy trì"
+      "2. Giới hạn tốc độ tối đa ")
+x=input(int())
+if x=="1":
+    print("Cố định tốc độ")
+    speed = 60
+    max_speed = 200
+    min_speed = 0
+
+    while True:
+        if keyboard.is_pressed('w'):
+            if speed < max_speed:
+                speed += 2
+                print(speed)
+            time.sleep(0.1)
+
+        elif keyboard.is_pressed('s'):
+            if speed > min_speed:
+                speed -= 2
+                print(speed)
+            time.sleep(0.1)
+
+        elif keyboard.is_pressed('o'):
+            print("Chọn tốc độ nhanh:")
+            print("1. 10   2. 20   3. 30   4. 40   5. 50")
+            print("6. 60   7. 70   8. 80   9. 90   0. 100")
+            time.sleep(0.5)  # Đợi người dùng bấm số
+
+            while True:
+                if keyboard.is_pressed('1'):
+                    speed = 10
+                    break
+                elif keyboard.is_pressed('2'):
+                    speed = 20
+                    break
+                elif keyboard.is_pressed('3'):
+                    speed = 30
+                    break
+                elif keyboard.is_pressed('4'):
+                    speed = 40
+                    break
+                elif keyboard.is_pressed('5'):
+                    speed = 50
+                    break
+                elif keyboard.is_pressed('6'):
+                    speed = 60
+                    break
+                elif keyboard.is_pressed('7'):
+                    speed = 70
+                    break
+                elif keyboard.is_pressed('8'):
+                    speed = 80
+                    break
+                elif keyboard.is_pressed('9'):
+                    speed = 90
+                    break
+                elif keyboard.is_pressed('0'):
+                    speed = 100
+                    break
+                time.sleep(0.1)
+            print(speed)
+            time.sleep(0.3)  # Tránh bị nhấn lặp
+
+        elif keyboard.is_pressed('enter'):
+            print(f"Tốc độ hiện tại: {speed}")
+            time.sleep(0.2)
+
+        elif keyboard.is_pressed('esc'):
+            print("Đã thoát.")
+            break
+if x=="2":
+    print("Tốc độ tối đa")
+    speed = 60
+    max_speed = 100
+    min_speed = 0
+
+    while True:
+        if keyboard.is_pressed('w'):
+            if speed < max_speed:
+                speed += 2
+                print(speed)
+            time.sleep(0.1)
+
+        elif keyboard.is_pressed('s'):
+            if speed > min_speed:
+                speed -= 2
+                print(speed)
+            time.sleep(0.1)
+
+        elif keyboard.is_pressed('o'):
+            print("Chọn tốc độ nhanh:")
+            print("1. 10   2. 20   3. 30   4. 40   5. 50")
+            print("6. 60   7. 70   8. 80   9. 90   0. 100")
+            time.sleep(0.5)  # Đợi người dùng bấm số
+
+            while True:
+                if keyboard.is_pressed('1'):
+                    speed = 10
+                    break
+                elif keyboard.is_pressed('2'):
+                    speed = 20
+                    break
+                elif keyboard.is_pressed('3'):
+                    speed = 30
+                    break
+                elif keyboard.is_pressed('4'):
+                    speed = 40
+                    break
+                elif keyboard.is_pressed('5'):
+                    speed = 50
+                    break
+                elif keyboard.is_pressed('6'):
+                    speed = 60
+                    break
+                elif keyboard.is_pressed('7'):
+                    speed = 70
+                    break
+                elif keyboard.is_pressed('8'):
+                    speed = 80
+                    break
+                elif keyboard.is_pressed('9'):
+                    speed = 90
+                    break
+                elif keyboard.is_pressed('0'):
+                    speed = 100
+                    break
+                time.sleep(0.1)
+            print(speed)
+            time.sleep(0.3)  # Tránh bị nhấn lặp
+
+        elif keyboard.is_pressed('enter'):
+            print(f"Tốc độ tối đa cho phép: {speed}")
+            time.sleep(0.2)
+
+            max_speed = speed
+            min_speed = 0
+            while True:
+                if keyboard.is_pressed('w'):
+                    if speed < max_speed:
+                        speed += 2
+                        print(speed)
+                    time.sleep(0.1)
+
+                elif keyboard.is_pressed('s'):
+
+                    if speed > min_speed:
+                        speed -= 2
+
+                        print(speed)
+
+                    time.sleep(0.1)
+
+                elif keyboard.is_pressed('o'):
+                    print("Chọn tốc độ nhanh:")
+                    print("1. 10   2. 20   3. 30   4. 40   5. 50")
+                    print("6. 60   7. 70   8. 80   9. 90   0. 100")
+                    print("Nhấn Enter để kết thúc chương trình.")
+                    time.sleep(0.5)
+                    selected = False
+                    while not selected:
+                        key = keyboard.read_key()  # Nhận phím người dùng nhấn
+                        if key == 'enter':
+                            print(f"✅ Kết thúc. Tốc độ hiện tại: {speed}")
+                            exit()  
+                        elif key == '1':
+                            selected_speed = 10
+                        elif key == '2':
+                            selected_speed = 20
+                        elif key == '3':
+                            selected_speed = 30
+                        elif key == '4':
+                            selected_speed = 40
+                        elif key == '5':
+                            selected_speed = 50
+                        elif key == '6':
+                            selected_speed = 60
+                        elif key == '7':
+                            selected_speed = 70
+                        elif key == '8':
+                            selected_speed = 80
+                        elif key == '9':
+                            selected_speed = 90
+                        elif key == '0':
+                            selected_speed = 100
+                        else:
+                            print("⛔ Phím không hợp lệ.")
+                            continue
+                        if selected_speed > max_speed:
+                            print(f"⚠️ Lỗi: Tốc độ {selected_speed} vượt quá giới hạn {max_speed}.")
+                            print("Vui lòng chọn lại.")
+                            time.sleep(0.5)
+                            continue
+                        else:
+                            speed = selected_speed
+                            print(f"✅ Đã chọn tốc độ: {speed}")
+                            selected = True
+                            time.sleep(0.3)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
